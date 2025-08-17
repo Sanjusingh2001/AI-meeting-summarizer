@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Meeting Notes Summarizer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .input-section, .output-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            margin-bottom: 15px;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            resize: vertical;
+        }
+        
+        textarea {
+            min-height: 120px;
+        }
+        
+        .btn {
+            background: #3498db;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+        }
+        
+        .btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+        }
+        
+        .summary-content {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            min-height: 200px;
+            white-space: pre-wrap;
+            font-family: inherit;
+        }
+        
+        .summary-content:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        .error {
+            color: #e74c3c;
+            background: #fdf2f2;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .success {
+            color: #27ae60;
+            background: #f0fff4;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            border: 1px solid #c6f5d1;
+        }
+        
+        .email-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
+        .email-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .email-form .form-group:last-child {
+            grid-column: 1 / -1;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .email-form {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Meeting Notes Summarizer</h1>
+            <p>Upload your meeting transcript and get AI-powered summaries with custom instructions</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2 class="section-title">📝 Input</h2>
+                <div class="form-group">
+                    <label for="transcript">Meeting Transcript:</label>
+                    <textarea id="transcript" placeholder="Paste your meeting transcript here..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="instruction">Custom Instruction (Optional):</label>
+                    <input type="text" id="instruction" placeholder="e.g., 'Bullet points for executives' or 'Highlight only action items'">
+                </div>
+                
+                <button class="btn" id="generateBtn" onclick="generateSummary()">🚀 Generate Summary</button>
+            </div>
+
+            <div class="output-section">
+                <h2 class="section-title">📋 Summary</h2>
+                <div class="form-group">
+                    <label for="title">Meeting Title:</label>
+                    <input type="text" id="title" placeholder="Enter meeting title...">
+                </div>
+                
+                <div class="form-group">
+                    <label for="summary">Generated Summary:</label>
+                    <div id="summary" class="summary-content" contenteditable="true" placeholder="Summary will appear here..."></div>
+                </div>
+                
+                <div class="form-group">
+                    <button class="btn btn-secondary" id="saveBtn" onclick="saveMeeting()" style="display: none;">💾 Save Meeting</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="email-section hidden" id="emailSection">
+            <h2 class="section-title">📧 Share via Email</h2>
+            <form class="email-form" id="emailForm">
+                <div class="form-group">
+                    <label for="recipientEmails">Recipient Emails:</label>
+                    <input type="text" id="recipientEmails" placeholder="email1@example.com, email2@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="emailSubject">Subject:</label>
+                    <input type="text" id="emailSubject" value="Meeting Summary">
+                </div>
+                
+                <div class="form-group">
+                    <label for="emailMessage">Message (Optional):</label>
+                    <textarea id="emailMessage" placeholder="Add a personal message..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">📤 Send Email</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="messageArea"></div>
+    </div>
+
+    {% csrf_token %}
+    <script>
+        let currentMeetingId = null;
+
+        function showMessage(message, type) {
+            const messageArea = document.getElementById('messageArea');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type;
+            messageDiv.textContent = message;
+            messageArea.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        async function generateSummary() {
+            const transcript = document.getElementById('transcript').value.trim();
+            const instruction = document.getElementById('instruction').value.trim();
+            
+            if (!transcript) {
+                showMessage('Please enter a transcript first!', 'error');
+                return;
+            }
+            
+            const generateBtn = document.getElementById('generateBtn');
+            const summaryDiv = document.getElementById('summary');
+            
+            generateBtn.disabled = true;
+            generateBtn.textContent = '⏳ Generating...';
+            summaryDiv.innerHTML = '<div class="loading">Generating summary... Please wait...</div>';
+            
+            try {
+                const response = await fetch('/api/generate-summary/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        transcript_text: transcript,
+                        custom_instruction: instruction
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    summaryDiv.textContent = data.summary;
+                    currentMeetingId = data.meeting_id;
+                    document.getElementById('saveBtn').style.display = 'inline-block';
+                    document.getElementById('emailSection').classList.remove('hidden');
+                    showMessage('Summary generated successfully!', 'success');
+                } else {
+                    summaryDiv.innerHTML = '<div class="error">Error: ' + data.error + '</div>';
+                    showMessage('Failed to generate summary', 'error');
+                }
+            } catch (error) {
+                summaryDiv.innerHTML = '<div class="error">Error: ' + error.message + '</div>';
+                showMessage('Network error occurred', 'error');
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = '🚀 Generate Summary';
+            }
+        }
+
+        async function saveMeeting() {
+            const title = document.getElementById('title').value.trim();
+            const summary = document.getElementById('summary').textContent;
+            
+            if (!title) {
+                showMessage('Please enter a meeting title!', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/save-meeting/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        meeting_id: currentMeetingId,
+                        title: title,
+                        summary: summary
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentMeetingId = data.meeting_id;
+                    showMessage('Meeting saved successfully!', 'success');
+                } else {
+                    showMessage('Failed to save meeting: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Network error occurred', 'error');
+            }
+        }
+
+        document.getElementById('emailForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const recipientEmails = document.getElementById('recipientEmails').value.trim();
+            const subject = document.getElementById('emailSubject').value.trim();
+            const message = document.getElementById('emailMessage').value.trim();
+            
+            if (!recipientEmails) {
+                showMessage('Please enter recipient emails!', 'error');
+                return;
+            }
+            
+            if (!currentMeetingId) {
+                showMessage('Please save the meeting first!', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/share-email/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        meeting_id: currentMeetingId,
+                        recipient_emails: recipientEmails,
+                        subject: subject,
+                        message: message
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage(data.message, 'success');
+                    // Clear email form
+                    document.getElementById('emailForm').reset();
+                } else {
+                    showMessage('Failed to share: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Network error occurred', 'error');
+            }
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Add some sample text for testing
+        document.getElementById('transcript').addEventListener('focus', function() {
+            if (!this.value) {
+                this.placeholder = `Sample transcript:
+Meeting: Weekly Team Standup
+Date: January 15, 2024
+
+John: Good morning team! Let's start with our weekly standup. Sarah, what did you work on last week?
+
+Sarah: I completed the user authentication module and started working on the dashboard redesign. I'm about 70% done with the dashboard.
+
+Mike: I finished the API documentation and fixed three bugs in the payment system. I also helped Sarah with some frontend issues.
+
+John: Great progress! What are your plans for this week?
+
+Sarah: I'll complete the dashboard redesign and start on the mobile responsive design.
+
+Mike: I'll work on implementing the new reporting feature and continue bug fixes.
+
+John: Sounds good. Any blockers or questions?
+
+Sarah: I might need help with the mobile CSS framework. Mike, are you available?
+
+Mike: Yes, I can help with that. Let's schedule a quick call tomorrow.
+
+John: Perfect. Meeting adjourned.`;
+            }
+        });
+    </script>
+</body>
+</html>
