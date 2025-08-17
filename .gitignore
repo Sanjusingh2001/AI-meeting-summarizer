@@ -18,22 +18,8 @@ db.sqlite3-journal
 venv/
 env/
 ENV/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+env.bak/
+venv.bak/
 
 # Python
 *.py[cod]
@@ -55,8 +41,17 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
-# Coverage reports
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
 htmlcov/
 .tox/
 .coverage
@@ -72,19 +67,76 @@ coverage.xml
 *.mo
 *.pot
 
-# Media files
-media/
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
 
-# Static files (if collected)
-staticfiles/
+# Flask stuff:
+instance/
+.webassets-cache
 
-# Node modules (if using frontend build tools)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Scrapy stuff:
+.scrapy
 
-# Backup files
-*.bak
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
 *.tmp
-*.temp 
+*.temp
